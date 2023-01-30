@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-// Take parameters from the command line
 const program = require('commander');
 const { version } = require('../package.json');
 const run = require('../index.js');
