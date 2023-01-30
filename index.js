@@ -1,17 +1,10 @@
-// Create a node script which takes an array of github repos and, for each, does the following:
-// 1. Download repo
-// 2. Run npm install
-// 3. Run npm test
-// 4. If tests pass, copy the content of the .github folder inside the repo to a folder called .github in the root of the project
-// 5. If tests fail, console.log it
-// 6. git add, commit and push the .github folder to the repo with the message "ci: Added Node CI"
-
 const { exec } = require('child_process');
-const fs = require('fs');
 const path = require('path');
 const config = require('./config.json');
 
-if (!config.verbose) {
+console.log(config)
+
+if (!config.options.verbose) {
   console.log = () => { };
 }
 
@@ -27,23 +20,23 @@ if (config.safeRun) {
   console.log('Safe run enabled. No changes will be made to the repositories');
 }
 
-let repobaseUrl;
+let repoBaseUrl;
 if (config.customUrl) {
-  repoBaseUrl = config.customUrl.replace('{{username}}', config.github_username);
+  repoBaseUrl = config.customUrl.replace('{{username}}', config.github.username);
 } else {
   if (config.mode === 'ssh') {
-    repoBaseUrl = `git@github.com:${config.github_username}/{{repo}}.git`;
+    repoBaseUrl = `git@github.com:${config.github.username}/{{repo}}.git`;
   } else {
-    repoBaseUrl = `https://github.com/${config.github_username}/{{repo}}.git`;
+    repoBaseUrl = `https://github.com/${config.github.username}/{{repo}}.git`;
   }
 }
 
-const githubFolder = path.join(__dirname, '.github');
+const migratorGithubFolder = path.join(__dirname, '.github');
 
 const cloneRepo = (repo) => {
   return new Promise((resolve, reject) => {
-    console.log(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}`);
-    exec(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}`, (error, stdout, stderr) => {
+    console.log(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}/${repo}`);
+    exec(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}/${repo}`, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -54,9 +47,10 @@ const cloneRepo = (repo) => {
 }
 
 const runNpmInstall = (repo) => {
+  const installCommand = config.commands.install || 'npm install';
   return new Promise((resolve, reject) => {
-    console.log(config.folder, ' >> ', `npm install`);
-    exec(`npm install`, { cwd: config.folder }, (error, stdout, stderr) => {
+    console.log(config.folder, ' >> ', installCommand);
+    exec(installCommand, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -67,9 +61,10 @@ const runNpmInstall = (repo) => {
 }
 
 const runNpmTest = (repo) => {
-  console.log(config.folder, ' >> ', `npm test`);
+  const testCommand = config.commands.test || 'npm test';
+  console.log(config.folder, ' >> ', testCommand);
   return new Promise((resolve, reject) => {
-    exec(`npm test`, { cwd: config.folder }, (error, stdout, stderr) => {
+    exec(testCommand, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -80,9 +75,9 @@ const runNpmTest = (repo) => {
 }
 
 const copyGithubFolder = (repo) => {
-  console.log(config.folder, ' >> ', `cp -r ${githubFolder} ./${repo}`);
+  console.log(config.folder, ' >> ', `cp -r ${migratorGithubFolder} ./${repo}/.github`);
   return new Promise((resolve, reject) => {
-    exec(`cp -r ${githubFolder} ./${repo}`, { cwd: config.folder }, (error, stdout, stderr) => {
+    exec(`cp -r ${migratorGithubFolder} ./${repo}/.github`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -133,6 +128,7 @@ const pushGithubFolder = (repo) => {
 
 const run = async () => {
   for (const repo of config.repositories) {
+    console.log('Processing repo: ', repo)
     try {
       await cloneRepo(repo);
       await copyGithubFolder(repo);
@@ -150,5 +146,6 @@ const run = async () => {
     }
   }
 }
-
-run();
+(async () => {
+  await run();
+})();
