@@ -27,5 +27,10 @@
   "homepage": "https://github.com/Cadienvan/github-workflow-migrator#readme",
   "dependencies": {
     "commander": "^10.0.0"
-  }
+  },
+  "files": [
+    "bin",
+    "package.json",
+    "README.md"
+  ]
 }
