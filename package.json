@@ -1,0 +1,31 @@
+{
+  "name": "github-workflow-migrator",
+  "version": "1.0.0",
+  "description": "This is a tool to migrate GitHub Actions workflows from one repository to another/multiple repositories.",
+  "main": "index.js",
+  "bin": {
+    "github-workflow-migrator": "bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cadienvan/github-workflow-migrator.git"
+  },
+  "keywords": [
+    "github",
+    "actions",
+    "workflows",
+    "migrator",
+    "migrate",
+    "npm",
+    "cli"
+  ],
+  "author": "Michael Di Prisco <cadienvan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Cadienvan/github-workflow-migrator/issues"
+  },
+  "homepage": "https://github.com/Cadienvan/github-workflow-migrator#readme",
+  "dependencies": {
+    "commander": "^10.0.0"
+  }
+}
