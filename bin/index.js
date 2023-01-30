@@ -21,9 +21,9 @@ program
   // Custom Url
   .option('-cu, --custom-url <url>', 'Custom url to clone the repositories. Use {{username}} and {{repo}} as placeholders.')
   // Source path
-  .option('-sp, --source-path <path>', 'Path to the .github folder to copy to the repositories')
+  .option('-sp, --source-path <path>', 'The .github folder to copy to the repositories (Es. MY_GITHUB_FOLDER/.github).')
   // Folder
-  .option('-f, --folder <path>', 'Path to the folder where the repositories will be cloned', '.')
+  .option('-f, --folder <path>', 'Path to the folder where the repositories will be cloned. A folder for every repository will be created inside it.', '.')
   // Commands
   .option('-ci, --commands-install <command>', 'Command to run npm install', 'npm install')
   .option('-ct, --commands-test <command>', 'Command to run npm test', 'npm test')
