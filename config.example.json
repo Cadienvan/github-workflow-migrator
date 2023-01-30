@@ -2,5 +2,18 @@
   "github": {
     "username": "JohnDoe",
     "mode": "ssh"
+  },
+  "options": {
+    "install": true,
+    "tests": true,
+    "safeRun": true,
+    "verbose": true
+  },
+  "repositories": ["my-repo"],
+  "customUrl": "git@github.com:{{username}}/{{repo}}.git",
+  "folder": "/Users/mdiprisco/www/migrate",
+  "commands": {
+    "install": "npm install",
+    "test": "npm test"
   }
 }
