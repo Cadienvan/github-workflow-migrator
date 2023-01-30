@@ -38,7 +38,7 @@ if (opts.help) {
 const config = opts.config ? require(opts.config) :
   {
     github: {
-      user: opts.githubUser,
+      username: opts.githubUser,
       mode: opts.githubMode,
     },
     options: {
