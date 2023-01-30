@@ -20,6 +20,8 @@ program
   .option('-rp, --repositories <repos>', 'List of repositories to process. Comma separated.', '')
   // Custom Url
   .option('-cu, --custom-url <url>', 'Custom url to clone the repositories. Use {{username}} and {{repo}} as placeholders.')
+  // Source path
+  .option('-sp, --source-path <path>', 'Path to the .github folder to copy to the repositories')
   // Folder
   .option('-f, --folder <path>', 'Path to the folder where the repositories will be cloned', '.')
   // Commands
@@ -49,6 +51,7 @@ const config = opts.config ? require(opts.config) :
     },
     repositories: opts.repositories.split(',').map(repo => repo.trim()) || [],
     customUrl: opts.customUrl || undefined,
+    sourcePath: opts.sourcePath || undefined,
     folder: opts.folder || '.',
     commands: {
       install: opts.commandsInstall || 'npm install',

@@ -10,6 +10,10 @@ async function run(config) {
     console.log = () => { };
   }
 
+  if(!config.sourcePath) {
+    console.log('No source path provided. Trying to use the local .github folder');
+  }
+
   if (['ssh', 'https'].indexOf(config.github.mode) === -1) {
     throw new Error('Invalid mode. Please use either ssh or https');
   }
@@ -33,7 +37,7 @@ async function run(config) {
     }
   }
 
-  const migratorGithubFolder = path.join(__dirname, '.github');
+  const migratorGithubFolder = config.sourcePath || path.join(__dirname, '.github');
 
   for (const repo of config.repositories) {
     console.log('Processing repo: ', repo)
