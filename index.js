@@ -11,9 +11,22 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config.json');
 
-if (['ssh', 'https'].indexOf(config.mode) === -1) {
+if (!config.verbose) {
+  console.log = () => { };
+}
+
+if (['ssh', 'https'].indexOf(config.github.mode) === -1) {
   throw new Error('Invalid mode. Please use either ssh or https');
 }
+
+if (config.repositories.length === 0) {
+  throw new Error('No repositories found. Please add at least one repository to the config.json file');
+}
+
+if (config.safeRun) {
+  console.log('Safe run enabled. No changes will be made to the repositories');
+}
+
 let repobaseUrl;
 if (config.customUrl) {
   repoBaseUrl = config.customUrl.replace('{{username}}', config.github_username);
@@ -29,7 +42,7 @@ const githubFolder = path.join(__dirname, '.github');
 
 const cloneRepo = (repo) => {
   return new Promise((resolve, reject) => {
-    console.log('Cloning repo: ', repo);
+    console.log(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}`);
     exec(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}`, (error, stdout, stderr) => {
       if (error) {
         reject(error);
@@ -42,7 +55,7 @@ const cloneRepo = (repo) => {
 
 const runNpmInstall = (repo) => {
   return new Promise((resolve, reject) => {
-    console.log('Running npm install', repo);
+    console.log(config.folder, ' >> ', `npm install`);
     exec(`npm install`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
@@ -54,7 +67,7 @@ const runNpmInstall = (repo) => {
 }
 
 const runNpmTest = (repo) => {
-  console.log('Running npm test', repo);
+  console.log(config.folder, ' >> ', `npm test`);
   return new Promise((resolve, reject) => {
     exec(`npm test`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
@@ -67,9 +80,9 @@ const runNpmTest = (repo) => {
 }
 
 const copyGithubFolder = (repo) => {
-  console.log('Copying github folder', repo);
+  console.log(config.folder, ' >> ', `cp -r ${githubFolder} ./${repo}`);
   return new Promise((resolve, reject) => {
-    exec(`cp -r ${githubFolder} ./${repo}`, { cwd: path.join(__dirname) }, (error, stdout, stderr) => {
+    exec(`cp -r ${githubFolder} ./${repo}`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -80,7 +93,7 @@ const copyGithubFolder = (repo) => {
 }
 
 const addGithubFolder = (repo) => {
-  console.log('Adding github folder', repo);
+  console.log(config.folder, ' >> ', `git add --all`)
   return new Promise((resolve, reject) => {
     exec(`git add --all`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
@@ -93,9 +106,9 @@ const addGithubFolder = (repo) => {
 }
 
 const commitGithubFolder = (repo) => {
-  console.log('Committing github folder', repo);
+  console.log(config.folder, ' >> ', `git commit -m "ci: Added Github Folder"`)
   return new Promise((resolve, reject) => {
-    exec(`git commit -m "ci: Added Node CI"`, { cwd: config.folder }, (error, stdout, stderr) => {
+    exec(`git commit -m "ci: Added Github Folder"`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -106,7 +119,7 @@ const commitGithubFolder = (repo) => {
 }
 
 const pushGithubFolder = (repo) => {
-  console.log('Pushing github folder', repo);
+  console.log(config.folder, ' >> ', `git push`)
   return new Promise((resolve, reject) => {
     exec(`git push`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
