@@ -30,7 +30,7 @@ const githubFolder = path.join(__dirname, '.github');
 const cloneRepo = (repo) => {
   return new Promise((resolve, reject) => {
     console.log('Cloning repo: ', repo);
-    exec(`git clone ${repoBaseUrl.replace('{{repo}}', repo)}`, (error, stdout, stderr) => {
+    exec(`git clone ${repoBaseUrl.replace('{{repo}}', repo)} ${config.folder}`, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -43,7 +43,7 @@ const cloneRepo = (repo) => {
 const runNpmInstall = (repo) => {
   return new Promise((resolve, reject) => {
     console.log('Running npm install', repo);
-    exec(`npm install`, { cwd: path.join(__dirname, repo) }, (error, stdout, stderr) => {
+    exec(`npm install`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -56,7 +56,7 @@ const runNpmInstall = (repo) => {
 const runNpmTest = (repo) => {
   console.log('Running npm test', repo);
   return new Promise((resolve, reject) => {
-    exec(`npm test`, { cwd: path.join(__dirname, repo) }, (error, stdout, stderr) => {
+    exec(`npm test`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -82,7 +82,7 @@ const copyGithubFolder = (repo) => {
 const addGithubFolder = (repo) => {
   console.log('Adding github folder', repo);
   return new Promise((resolve, reject) => {
-    exec(`git add --all`, { cwd: path.join(__dirname, repo) }, (error, stdout, stderr) => {
+    exec(`git add --all`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -95,7 +95,7 @@ const addGithubFolder = (repo) => {
 const commitGithubFolder = (repo) => {
   console.log('Committing github folder', repo);
   return new Promise((resolve, reject) => {
-    exec(`git commit -m "ci: Added Node CI"`, { cwd: path.join(__dirname, repo) }, (error, stdout, stderr) => {
+    exec(`git commit -m "ci: Added Node CI"`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
@@ -108,7 +108,7 @@ const commitGithubFolder = (repo) => {
 const pushGithubFolder = (repo) => {
   console.log('Pushing github folder', repo);
   return new Promise((resolve, reject) => {
-    exec(`git push`, { cwd: path.join(__dirname, repo) }, (error, stdout, stderr) => {
+    exec(`git push`, { cwd: config.folder }, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
